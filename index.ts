@@ -3,7 +3,10 @@ import sharp from "sharp";
 import { Image } from "image-js";
 
 async function decodePNGSharp(buffer: Buffer) {
-  const rawOutput = await sharp(buffer).raw().toColorspace("grey16").toBuffer();
+  const rawOutput = await sharp(buffer)
+    .raw({ depth: "ushort" })
+    .toColorspace("grey16")
+    .toBuffer();
   return new Uint16Array(rawOutput);
 }
 
