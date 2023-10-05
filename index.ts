@@ -7,7 +7,7 @@ async function decodePNGSharp(buffer: Buffer) {
     .raw({ depth: "ushort" })
     .toColorspace("grey16")
     .toBuffer();
-  return new Uint16Array(rawOutput);
+  return new Uint16Array(rawOutput.buffer, 0, rawOutput.length / 2);
 }
 
 async function decodePNGImageJs(buffer: Buffer) {
@@ -15,13 +15,24 @@ async function decodePNGImageJs(buffer: Buffer) {
   return new Uint16Array(image.data.buffer);
 }
 
+function arraysEqual(a: Uint16Array, b: Uint16Array): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 async function main() {
   const png = readFileSync("./data.png");
   const sharpPng = await decodePNGSharp(png);
   const imageJsPng = await decodePNGImageJs(png);
 
-  console.log(sharpPng);
-  console.log(imageJsPng);
+  console.log(arraysEqual(sharpPng, imageJsPng));
 }
 
 main().catch((error) => {
